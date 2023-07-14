@@ -19,7 +19,7 @@ router.get("/getproducts",async(req, res)=>{
 
 
 // get individual data
-router.get("/getproductsone/:id",async(req, res)=>{
+router.get("/getproductsone/${id}",async(req, res)=>{
    try{
       const{id}=req.params;
       // console.log(id);
@@ -138,7 +138,8 @@ router.get("/cartdetails",authenticate,async(req, res)=>{
 
 
   }catch(error){
-    console.log("error"+error)
+    console.log("error"+error);
+    res.status(500).json({ error: "Internal server error" });
   }
 })
 
@@ -150,7 +151,8 @@ router.get("/validuser",authenticate,async(req, res)=>{
  
  
    }catch(error){
-     console.log("error"+error)
+     console.log("error"+error);
+     res.status(500).json({ error: "Internal server error" });
    }
  })
 
@@ -163,13 +165,14 @@ router.delete("/remove/:id",authenticate,async(req, res)=>{
          return cruval.id!=id;
          // jo item match na hoye vohi return hoyengi fir array mai
       });
-      req.rootUser.save();
+      await req.rootUser.save();
       res.status(201).json(req.rootUser);
       console.log("item remove");
 
    }catch(error){
       console.log("error"+error);
       res.status(400).json(req.rootUser);
+      res.status(500).json({ error: "Internal server error" });
     }
 })
 // user logout
@@ -179,14 +182,14 @@ router.get("/logout",authenticate,async(req,res)=>{
    req.rootUser.tokens=req.rootUser.tokens.filter((curelem)=>{
       return curelem.token !== req.token
    });
+   await req.rootUser.save();
    res.clearCookie("Amazonweb",{path:"/"});
-
-   req.rootUser.save();
    res.status(201).json(req.rootUser.tokens);
    console.log("user logout");
 
   }catch(error){
    console,log("error user logout");
+   res.status(500).json({ error: "Internal server error" });
   }
 
 });
